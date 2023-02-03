@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Machine driver for AMD Vangogh platform using NAU8821 & CS35L41
+ * Machine driver for AMD Vangogh platform using NAU8821 & MAX98388
  * codecs.
  *
  * Copyright 2021 Advanced Micro Devices, Inc.
@@ -17,14 +17,16 @@
 #include <linux/clk.h>
 #include <linux/gpio.h>
 #include <linux/gpio/consumer.h>
+#include <linux/module.h>
 #include <linux/i2c.h>
 #include <linux/input.h>
+#include <linux/io.h>
 #include <linux/acpi.h>
 #include <linux/dmi.h>
 
 #include "../../codecs/nau8821.h"
 
-#define USE_MAX98388 /* Enable this to use two max98396 amplifiers */
+#define USE_MAX98388 /* Enable this to use two max98388 amplifiers */
 #ifdef USE_MAX98388
 #undef USE_CS35L41
 #include "../../codecs/max98388.h"
@@ -69,7 +71,7 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 	 * Headset buttons map to the google Reference headset.
 	 * These can be configured by userspace.
 	 */
-	ret = snd_soc_card_jack_new_pins(card, "Headset Jack",
+	ret = snd_soc_card_jack_new(card, "Headset Jack",
 					 SND_JACK_HEADSET | SND_JACK_BTN_0,
 					 &vg_headset, acp5x_nau8821_jack_pins,
 					 ARRAY_SIZE(acp5x_nau8821_jack_pins));
@@ -237,7 +239,8 @@ static int acp5x_cs35l41_hw_params(struct snd_pcm_substream *substream,
 	ret = 0;
 	for (i = 0; i < num_codecs; i++) {
 		codec_dai = asoc_rtd_to_codec(rtd, i);
-		if (strcmp(codec_dai->name, "cs35l41-pcm") == 0) {
+		if ((strcmp(codec_dai->name, "spi-VLV1776:00") == 0) ||
+		    (strcmp(codec_dai->name, "spi-VLV1776:01") == 0)) {
 			switch (params_rate(params)) {
 			case 48000:
 				bclk_val = 1536000;
@@ -386,7 +389,7 @@ static int platform_clock_control(struct snd_soc_dapm_widget *w,
 		ret = snd_soc_dai_set_sysclk(codec_dai, NAU8821_CLK_FLL_BLK, 0,
 					     SND_SOC_CLOCK_IN);
 		if (ret < 0)
-			dev_err(codec_dai->dev, "can't set BLK clock %d\n", ret);
+			dev_err(codec_dai->dev, "can't set FS clock %d\n", ret);
 		ret = snd_soc_dai_set_pll(codec_dai, 0, 0, ACP5X_NUVOTON_BCLK,
 					  ACP5X_NAU8821_FREQ_OUT);
 		if (ret < 0)
@@ -510,6 +513,6 @@ static struct platform_driver acp5x_mach_driver = {
 module_platform_driver(acp5x_mach_driver);
 
 MODULE_AUTHOR("Vijendar.Mukunda@amd.com");
-MODULE_DESCRIPTION("NAU8821 & CS35L41 audio support");
+MODULE_DESCRIPTION("NAU8821 & MAX98388 audio support");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:" DRV_NAME);
