@@ -236,7 +236,7 @@ static int acp5x_cs35l41_hw_params(struct snd_pcm_substream *substream,
 	unsigned int num_codecs = rtd->dai_link->num_codecs;
 	unsigned int bclk_val;
 
-	ret = 0;
+	
 	for (i = 0; i < num_codecs; i++) {
 		codec_dai = asoc_rtd_to_codec(rtd, i);
 		if ((strcmp(codec_dai->name, "spi-VLV1776:00") == 0) ||
@@ -327,7 +327,7 @@ SND_SOC_DAILINK_DEF(platform,
 
 static struct snd_soc_dai_link acp5x_dai[] = {
 	{
-		.name = "acp5x-8821-play",
+		.name = "acp5x-8825-play",
 		.stream_name = "Playback/Capture",
 		.dai_fmt = SND_SOC_DAIFMT_I2S  | SND_SOC_DAIFMT_NB_NF |
 			   SND_SOC_DAIFMT_CBC_CFC,
@@ -473,6 +473,8 @@ static int acp5x_probe(struct platform_device *pdev)
 	int ret;
 	struct acp5x_platform_info *machine;
 	struct snd_soc_card *card;
+
+	printk(KERN_INFO "acp5x probe\n");
 
 	machine = devm_kzalloc(&pdev->dev, sizeof(struct acp5x_platform_info),
 			       GFP_KERNEL);
