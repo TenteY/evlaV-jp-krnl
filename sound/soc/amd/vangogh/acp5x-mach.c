@@ -71,6 +71,7 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 	 * Headset buttons map to the google Reference headset.
 	 * These can be configured by userspace.
 	 */
+	printk(KERN_INFO "------ acp5x new pins\n");
 	ret = snd_soc_card_jack_new_pins(card, "Headset Jack",
 					 SND_JACK_HEADSET | SND_JACK_BTN_0,
 					 &vg_headset, acp5x_nau8821_jack_pins,
@@ -474,20 +475,21 @@ static int acp5x_probe(struct platform_device *pdev)
 	struct acp5x_platform_info *machine;
 	struct snd_soc_card *card;
 
-	printk(KERN_INFO "acp5x probe\n");
-
+	printk(KERN_INFO "------ acp5x probe\n");
 	machine = devm_kzalloc(&pdev->dev, sizeof(struct acp5x_platform_info),
 			       GFP_KERNEL);
 	if (!machine)
 		return -ENOMEM;
 
 	dmi_check_system(acp5x_vg_quirk_table);
-	switch (acp5x_machine_id) {
+	switch(acp5x_machine_id) {
 	case VG_JUPITER:
+		printk(KERN_INFO "------ acp5x jupiter\n");
 		card = &acp5x_card;
 		acp5x_card.dev = &pdev->dev;
 		break;
 	default:
+		printk(KERN_INFO "------ acp5x other %d\n", acp5x_machine_id);
 		return -ENODEV;
 	}
 
