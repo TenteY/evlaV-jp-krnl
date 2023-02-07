@@ -470,3 +470,16 @@ config DRM_LIB_RANDOM
 config DRM_PRIVACY_SCREEN
 	bool
 	default n
+
+config DRM_EVDI
+	tristate "Extensible Virtual Display Interface"
+	depends on DRM
+	depends on USB_SUPPORT
+	depends on USB_ARCH_HAS_HCD
+	select USB
+	select DRM_KMS_HELPER
+	help
+		This is a KMS interface driver allowing user-space programs to
+		register a virtual display (that imitates physical monitor) and
+		retrieve contents (as a frame buffer) that system renders on it.
+		Say M/Y to add support for these devices via DRM/KMS interfaces.
