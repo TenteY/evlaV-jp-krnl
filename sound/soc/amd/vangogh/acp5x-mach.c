@@ -93,7 +93,7 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 static int acp5x_max98388_init(struct snd_soc_pcm_runtime *rtd)
 {
 	int ret = 0;
-
+	printk(KERN_INFO "------ acp5x max98388 init\n");
 	return ret;
 }
 #else
@@ -502,7 +502,7 @@ static int acp5x_probe(struct platform_device *pdev)
 				     "snd_soc_register_card(%s) failed\n",
 				     acp5x_card.name);
 	}
-
+	printk(KERN_INFO "------ acp5x probe return\n");
 	return 0;
 }
 
