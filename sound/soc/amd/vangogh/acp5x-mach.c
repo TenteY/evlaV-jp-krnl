@@ -71,8 +71,8 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 	 * Headset buttons map to the google Reference headset.
 	 * These can be configured by userspace.
 	 */
-	printk(KERN_INFO "------ acp5x new pins\n");
-	ret = snd_soc_card_jack_new_pins(card, "Headset Jack",
+	printk(KERN_INFO "------ acp5x new jack\n");
+	ret = snd_soc_card_jack_new(card, "Headset Jack",
 					 SND_JACK_HEADSET | SND_JACK_BTN_0,
 					 &vg_headset, acp5x_nau8821_jack_pins,
 					 ARRAY_SIZE(acp5x_nau8821_jack_pins));
