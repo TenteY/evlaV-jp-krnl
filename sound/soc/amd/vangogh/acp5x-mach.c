@@ -72,8 +72,7 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 	 * These can be configured by userspace.
 	 */
 	
-	ret = snd_soc_card_jack_new(card, "Headset Jack",
-					 SND_JACK_HEADSET | SND_JACK_BTN_0,
+	ret = snd_soc_card_jack_new_pins(card, "Headset Jack", SND_JACK_HEADSET | SND_JACK_BTN_0,
 					 &vg_headset, acp5x_nau8821_jack_pins,
 					 ARRAY_SIZE(acp5x_nau8821_jack_pins));
 	if (ret) {
@@ -475,7 +474,8 @@ static int acp5x_probe(struct platform_device *pdev)
 	struct acp5x_platform_info *machine;
 	struct snd_soc_card *card;
 
-	
+	pr_info("%s", __func__);
+
 	machine = devm_kzalloc(&pdev->dev, sizeof(struct acp5x_platform_info),
 			       GFP_KERNEL);
 	if (!machine)
@@ -484,12 +484,11 @@ static int acp5x_probe(struct platform_device *pdev)
 	dmi_check_system(acp5x_vg_quirk_table);
 	switch(acp5x_machine_id) {
 	case VG_JUPITER:
-	
 		card = &acp5x_card;
 		acp5x_card.dev = &pdev->dev;
 		break;
 	default:
-		
+		pr_info("NOT VG_JUPITER %s -ENODEV", __func__);
 		return -ENODEV;
 	}
 

@@ -8,7 +8,7 @@
  * Please see Documentation/driver-api/driver-model/platform.rst for more
  * information.
  */
-
+#define DEBUG
 #include <linux/string.h>
 #include <linux/platform_device.h>
 #include <linux/of_device.h>
@@ -808,6 +808,8 @@ struct platform_device *platform_device_register_full(
 {
 	int ret;
 	struct platform_device *pdev;
+
+	pr_info("%s %s", __func__, pdevinfo->name);
 
 	pdev = platform_device_alloc(pdevinfo->name, pdevinfo->id);
 	if (!pdev)

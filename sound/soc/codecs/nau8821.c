@@ -1602,7 +1602,6 @@ static const struct snd_soc_component_driver nau8821_component_driver = {
 	.dapm_routes		= nau8821_dapm_routes,
 	.num_dapm_routes	= ARRAY_SIZE(nau8821_dapm_routes),
 	.suspend_bias_off	= 1,
-	.non_legacy_dai_naming	= 1,
 	.idle_bias_on		= 1,
 	.use_pmdown_time	= 1,
 	.endianness		= 1,
@@ -1845,13 +1844,11 @@ static int nau8821_i2c_probe(struct i2c_client *i2c,
 	return ret;
 }
 
-static int nau8821_i2c_remove(struct i2c_client *i2c_client)
+static void nau8821_i2c_remove(struct i2c_client *i2c_client)
 {
 	struct nau8821 *nau8821 = i2c_get_clientdata(i2c_client);
 
 	devm_free_irq(nau8821->dev, nau8821->irq, nau8821);
-
-	return 0;
 }
 
 static const struct i2c_device_id nau8821_i2c_ids[] = {

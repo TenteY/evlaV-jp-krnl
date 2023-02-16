@@ -899,7 +899,6 @@ const struct snd_soc_component_driver soc_codec_dev_max98388 = {
 	.num_dapm_routes	= ARRAY_SIZE(max98388_audio_map),
 	.use_pmdown_time	= 1,
 	.endianness		= 1,
-	.non_legacy_dai_naming	= 1,
 };
 
 void max98388_read_deveice_property(struct device *dev,
@@ -946,6 +945,8 @@ static int max98388_i2c_probe(struct i2c_client *i2c,
 	int reg = 0;
 
 	struct max98388_priv *max98388 = NULL;
+
+	pr_info("%s", __func__);
 
 	max98388 = devm_kzalloc(&i2c->dev, sizeof(*max98388), GFP_KERNEL);
 
