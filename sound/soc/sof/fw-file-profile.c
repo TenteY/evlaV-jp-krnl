@@ -21,6 +21,9 @@ static int sof_test_firmware_file(struct device *dev,
 	const u32 *magic;
 	int ret;
 
+	if (!profile->fw_path || !profile->fw_name || !*profile->fw_name)
+		return 0;
+
 	fw_filename = kasprintf(GFP_KERNEL, "%s/%s", profile->fw_path,
 				profile->fw_name);
 	if (!fw_filename)
