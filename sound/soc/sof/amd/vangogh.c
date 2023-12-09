@@ -151,8 +151,14 @@ int sof_vangogh_ops_init(struct snd_sof_dev *sdev)
 	sof_vangogh_ops.num_drv = ARRAY_SIZE(vangogh_sof_dai);
 
 	dmi_id = dmi_first_match(acp_sof_quirk_table);
-	if (dmi_id && dmi_id->driver_data)
+	if (dmi_id && dmi_id->driver_data) {
 		sof_vangogh_ops.load_firmware = acp_sof_load_signed_firmware;
+		/*
+		 * Board doesn't use the default firmware, hence override
+		 * its name to prevent probe error due to fw validation.
+		 */
+		sdev->pdata->ipc_file_profile_base.fw_name = "";
+	}
 
 	return 0;
 }
