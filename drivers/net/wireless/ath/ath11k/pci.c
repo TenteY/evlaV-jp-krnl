@@ -27,6 +27,8 @@
 #define QCN9074_DEVICE_ID		0x1104
 #define WCN6855_DEVICE_ID		0x1103
 
+#define QCA206X_PCIC_SUB_VERSION	0x1910010
+
 static const struct pci_device_id ath11k_pci_id_table[] = {
 	{ PCI_VDEVICE(QCOM, QCA6390_DEVICE_ID) },
 	{ PCI_VDEVICE(QCOM, WCN6855_DEVICE_ID) },
@@ -728,8 +730,10 @@ static int ath11k_pci_probe(struct pci_dev *pdev,
 	struct ath11k_base *ab;
 	struct ath11k_pci *ab_pci;
 	u32 soc_hw_version_major, soc_hw_version_minor, addr;
+	u32 sub_version;
 	const struct ath11k_pci_ops *pci_ops;
 	int ret;
+	int ops_initialized = 0;
 
 	ab = ath11k_core_alloc(&pdev->dev, sizeof(*ab_pci), ATH11K_BUS_PCI);
 
@@ -806,7 +810,29 @@ static int ath11k_pci_probe(struct pci_dev *pdev,
 				break;
 			case 0x10:
 			case 0x11:
-				ab->hw_rev = ATH11K_HW_WCN6855_HW21;
+				pci_ops = &ath11k_pci_ops_qca6390;
+
+				ret = ath11k_pcic_register_pci_ops(ab, pci_ops);
+				if (ret) {
+					ath11k_err(ab, "failed to register PCI ops: %d\n", ret);
+					goto err_pci_free_region;
+				}
+
+				ops_initialized = 1;
+				sub_version = ath11k_pcic_read32(ab, QCA206X_PCIC_SUB_VERSION);
+
+				ath11k_dbg(ab, ATH11K_DBG_PCI, "sub_version 0x%x\n", sub_version);
+
+				switch (sub_version) {
+				case 0x1019A0E1:
+				case 0x1019B0E1:
+				case 0x1019C0E1:
+				case 0x1019D0E1:
+					ab ->hw_rev = ATH11K_HW_QCA206X_HW21;
+					break;
+				default:
+					ab->hw_rev = ATH11K_HW_WCN6855_HW21;
+				}
 				break;
 			default:
 				goto unsupported_wcn6855_soc;
@@ -829,10 +855,12 @@ unsupported_wcn6855_soc:
 		goto err_pci_free_region;
 	}
 
-	ret = ath11k_pcic_register_pci_ops(ab, pci_ops);
-	if (ret) {
-		ath11k_err(ab, "failed to register PCI ops: %d\n", ret);
-		goto err_pci_free_region;
+	if (ops_initialized == 0) {
+		ret = ath11k_pcic_register_pci_ops(ab, pci_ops);
+		if (ret) {
+			ath11k_err(ab, "failed to register PCI ops: %d\n", ret);
+			goto err_pci_free_region;
+		}
 	}
 
 	ret = ath11k_pcic_init_msi_config(ab);
