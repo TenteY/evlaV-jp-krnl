@@ -1,8 +1,8 @@
 variables:
   DOCKER_DRIVER: overlay2
   KERNEL: "bzImage"
-  ROOTFS_NAME: "stretch.img"
-  ROOTFS_IMAGE_URL: "https://gitlab.steamos.cloud/api/v4/projects/kernel-research%2Frootfs/jobs/129183/artifacts"
+  ROOTFS_NAME: "bullseye.img"
+  ROOTFS_IMAGE_URL: "https://gitlab.steamos.cloud/api/v4/projects/kernel-research%2Frootfs/jobs/468222/artifacts"
   GIT_AUTHOR_NAME: "Gitlab-ci"
   GIT_AUTHOR_EMAIL: "gitlab@gitlab.steamos.cloud"
 
@@ -170,7 +170,7 @@ test-kernel-qemu:
         -virtfs local,path=$(pwd),mount_tag=steamlogs,security_model=none \
         -m 2G -smp $(nproc --ignore=1) -cpu host \
         -net user,hostfwd=tcp::2222-:22 -net nic,model=virtio \
-        --append "root=/dev/sda rw console=ttyS0" &
+        --append "root=/dev/sda rw console=ttyS0 loglevel=7" &
     - QEMU_PID=$!
     - echo "Started QEMU, pid=$QEMU_PID"
     # Dump kernel test results
